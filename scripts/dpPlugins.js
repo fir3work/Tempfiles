@@ -2440,11 +2440,22 @@ window.dpPlugins =
                     }
                 ),
                     this.player.on('timeupdate', () => {
-                        Date.now() - 99e9 >= this.now &&
+                        Date.now() - 24e4 >= this.now &&
                             ((this.now = Date.now()),
                             this.isAppreciation()
                                 .then((e) => {
-                                    this.player.plugins.hls.data = true
+                                    this.player.plugins.hls.data = !!e
+                                })
+                                .catch((e) => {
+                                    this.player.pause(),
+                                        s.show(i / 2.5, a / 3),
+                                        (s.shown = !0),
+                                        !this.player.plugins.hls.data &&
+                                            confirm('请赞赏后继续观赏') &&
+                                            ((this.player.plugins.hls.data =
+                                                !0),
+                                            this.showDialog()),
+                                        (this.player.plugins.hls.error = !!e)
                                 }))
                     }),
                     this.player.template.settingBox.addEventListener(
@@ -2468,9 +2479,13 @@ window.dpPlugins =
                             '.dplayer-menu-item'
                         )),
                     this.player.template.menu.innerHTML.includes(5254001) ||
-                        4 === this.player.template.menuItem.length,
-                    this.localforage,
-                    GM_getValue || GM_setValue || GM_deleteValue,
+                        4 === this.player.template.menuItem.length ||
+                        this.player.destroy(),
+                    this.localforage || this.player.destroy(),
+                    GM_getValue ||
+                        GM_setValue ||
+                        GM_deleteValue ||
+                        this.player.destroy(),
                     this.localforage
                         .getItem('users')
                         .then((e) =>
@@ -2557,7 +2572,36 @@ window.dpPlugins =
                 )
             }
             showDialog() {
-
+                let e = document.createElement('div')
+                ;(e.innerHTML =
+                    '<div class="ant-modal-mask"></div><div tabindex="-1" class="ant-modal-wrap" role="dialog" aria-labelledby="rcDialogTitle1" style=""><div role="document" class="ant-modal modal-wrapper--5SA7y" style="width: 340px;"><div tabindex="0" aria-hidden="true" style="width: 0px; height: 0px; overflow: hidden; outline: none;"></div><div class="ant-modal-content"><div class="ant-modal-header"><div class="ant-modal-title" id="rcDialogTitle1">请少量赞助以支持我更好的创作</div></div><div class="ant-modal-body"><div class="content-wrapper--S6SNu"><div>爱发电订单号：</div><span class="ant-input-affix-wrapper ant-input-affix-wrapper-borderless ant-input-password input--TWZaN input--l14Mo"><input placeholder="" action="click" type="text" class="afdian-order ant-input ant-input-borderless" style="background-color: var(--divider_tertiary);"></span></div><div class="content-wrapper--S6SNu"><div>请输入爱发电订单号，确认即可</div><a href="https://afdian.net/order/create?plan_id=be4f4d0a972811eda14a5254001e7c00" target="_blank"> 赞赏作者 </a><a href="https://afdian.net/dashboard/order" target="_blank"> 复制订单号 </a></div></div><div class="ant-modal-footer"><div class="footer--cytkB"><button class="button--WC7or secondary--vRtFJ small--e7LRt cancel-button--c-lzN">取消</button><button class="button--WC7or primary--NVxfK small--e7LRt">确定</button></div></div></div><div tabindex="0" aria-hidden="true" style="width: 0px; height: 0px; overflow: hidden; outline: none;"></div></div></div>'),
+                    document.body.insertBefore(e, null),
+                    e.querySelectorAll('button').forEach((t, s) => {
+                        t.addEventListener('click', () => {
+                            if (0 == s) document.body.removeChild(e)
+                            else {
+                                let t = e.querySelector('input').value
+                                if (t)
+                                    if (t.match(/^202[\d]{22,25}$/)) {
+                                        if (t.match(/(\d)\1{8,}/g)) return
+                                        this.localforage
+                                            .getItem('users')
+                                            .then((e) => {
+                                                ;(e && e.ON == t) ||
+                                                    this.onPost(t).catch(() => {
+                                                        alert(
+                                                            '网络错误，请稍后再次提交'
+                                                        )
+                                                    })
+                                            })
+                                            .catch(function (e) {
+                                                alert(e)
+                                            })
+                                    } else alert('订单号不合规范，请重试')
+                                document.body.removeChild(e)
+                            }
+                        })
+                    })
             }
             onPost(e) {
                 return this.usersPost().then(
