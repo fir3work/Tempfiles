@@ -1,0 +1,13 @@
+# Unbreak
+# 修正屏蔽的域名
+
+# > weibo
+DOMAIN-SUFFIX,uve.weibo.com
+# > caixin
+DOMAIN,gg.caixin.com
+# > dedao
+DOMAIN-SUFFIX,umiwi.com
+# > general
+DOMAIN-SUFFIX, ucweb.com
+DOMAIN-SUFFIX, smtcdns.com
+DOMAIN-SUFFIX, smtcdns.net
